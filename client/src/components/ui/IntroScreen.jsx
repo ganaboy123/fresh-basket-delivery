@@ -156,7 +156,13 @@ function CinematicIntro({ onDone }) {
 export default function IntroGate({ children }) {
   const [done, setDone] = useState(false);
 
-  if (done) return <>{children}</>;
-
-  return <CinematicIntro onDone={() => setDone(true)} />;
+  return (
+    <>
+      {/* Always render children underneath so the app is ready instantly */}
+      <div style={{ visibility: done ? 'visible' : 'hidden', pointerEvents: done ? 'auto' : 'none' }}>
+        {children}
+      </div>
+      {!done && <CinematicIntro onDone={() => setDone(true)} />}
+    </>
+  );
 }
