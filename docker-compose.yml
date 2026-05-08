@@ -1,0 +1,43 @@
+version: '3.9'
+services:
+  mongodb:
+    image: mongo:7
+    container_name: fresh-basket-mongodb
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+
+  server:
+    build:
+      context: ./server
+    container_name: fresh-basket-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGODB_URI: mongodb://mongodb:27017/fresh-basket-delivery
+      JWT_SECRET: change-me-in-production
+      JWT_EXPIRES_IN: 7d
+      CLIENT_URL: http://localhost:8080
+      API_PREFIX: /api
+      DEFAULT_PAGE_LIMIT: 12
+      MAX_PAGE_LIMIT: 50
+    depends_on:
+      - mongodb
+    ports:
+      - '5000:5000'
+
+  client:
+    build:
+      context: ./client
+    container_name: fresh-basket-client
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - '8080:80'
+
+volumes:
+  mongo_data:
